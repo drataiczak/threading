@@ -18,7 +18,7 @@ int main() {
     char *argv[] = { "forkfact.out", "5", NULL };
     printf("[%d] Building command line for execv\n", getpid());
 
-    if(-1 == execv("/home/devin/Documents/threading/forkfact", argv)) {
+    if(-1 == execv("/home/devin/Documents/threading/forkfact.out", argv)) {
       fprintf(stderr, "[!] Error calling execv()\n");
       exit(-1);
     }
