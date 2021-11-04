@@ -17,10 +17,12 @@ void consume(char *memory) {
 
         printf("Memory:\n%s\n", memory);
 
+        /* If we see "end" in the buffer, stop reading */
         if(0 == strncmp(memory, "end", 3)) {
             return;
         }
 
+        /* Flush the buffer just in case and then pause */
         fflush(stdout);
         sleep(1);
     }
@@ -41,16 +43,21 @@ int main(int argc, char **argv) {
     int fd = 0;
     char *memory = NULL;
 
-    if(argc < 2) {
+    if(argc != 3) {
         fprintf(stderr, "Usage: %s <file> [r] | [w]\n", argv[0]);
     }
 
-    fd = open(argv[1], O_RDWR | O_CREAT);
+    /* Open the specified file.
+    * No error checking done here for simplicity.
+    * Open read/write/create
+    */
+    fd = open(argv[argc - 2], O_RDWR | O_CREAT);
     if(fd < 0) {
         fprintf(stderr, "[!] Unable to open file: %s\n", argv[1]);
         return -1;
     }
 
+    /* Map at most MAX_MEM bytes from the file into shared memory */
     memory = mmap(NULL, MAX_MEM, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     if(MAP_FAILED == memory) {
         fprintf(stderr, "[!] Failed to map memory space for file\n");
@@ -61,12 +68,12 @@ int main(int argc, char **argv) {
     close(fd);
 
     /* Consumer */
-    if(0 == strcmp(argv[2], "r")) {
+    if(0 == strcmp(argv[argc - 1], "r")) {
        consume(memory);
     }
 
     /* Producer */
-    if(0 == strcmp(argv[2], "w")) {
+    if(0 == strcmp(argv[argc - 1], "w")) {
         produce(memory);
     }
 
